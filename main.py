@@ -40,19 +40,15 @@ def select_day():
     if not selected_month:
         answer.config(text="Vispirms izvēlējieties mēnesi!", fg='red')
         return
-    
     selected_day_index = mylist.curselection()
     if not selected_day_index:
         answer.config(text="Vispirms izvēlējieties dienu!", fg='red')
         return
     selected_day = int(mylist.get(selected_day_index).split()[0])
-    
     day_of_year = get_day_of_year(selected_month, selected_day)
     print(f"Dienuas numurs gadā: {day_of_year}")
-    
     file_path = "CO2.csv"
     day_data = get_data_for_day(file_path, day_of_year)
-    
     if day_data:
         co2_value = float(day_data['CO2'])
         if co2_value > 1000:
