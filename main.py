@@ -4,6 +4,7 @@ from tkinter import *
 
 r = tk.Tk()
 r.title('CO2 Programma')
+r.configure(background='#A8DADC')
 
 months=['Janvaris', 'Februaris', 'Marts', 'Aprīlis', 'Maijs', 'Jūnijs', 'Jūlijs', 'Augusts', 'Septembris', 'Oktorbis', 'Novembris', 'Decembris']
 days_in_month = {'Janvaris':31, 'Februaris':28, 'Marts':31, 'Aprīlis':30, 'Maijs':31, 'Jūnijs':30, 'Jūlijs':31, 'Augusts':31, 'Septembris':30, 'Oktorbis':31, 'Novembris':30, 'Decembris':31}
@@ -13,7 +14,7 @@ def get_day_of_year(month, day):
     days_before_month = {
         'Janvāris': 0, 'Februāris': 31, 'Marts': 59, 'Aprīlis': 90,
         'Maijs': 120, 'Jūnijs': 151, 'Jūlijs': 181, 'Augusts': 212,
-        'Septembris': 243, 'Oktobris': 273, 'Novembris': 304, 'Decembris': 334
+        'Septembris': 242, 'Oktobris': 273, 'Novembris': 303, 'Decembris': 334
     }
     return days_before_month[month] + day
 def on_month_select(event):
@@ -41,25 +42,32 @@ def select_day():
         answer.config(text="Vispirms izvēlējieties mēnesi!", fg='red')
         return
     selected_day_index = mylist.curselection()
-    if not selected_day_index:
+    
+    if not selected_day_index:  # If nothing is selected
         answer.config(text="Vispirms izvēlējieties dienu!", fg='red')
         return
-    selected_day = int(mylist.get(selected_day_index).split()[0])
+
+    selected_day = int(mylist.get(selected_day_index[0]).split()[0])  # Get the selected day
     day_of_year = get_day_of_year(selected_month, selected_day)
     print(f"Dienuas numurs gadā: {day_of_year}")
-    file_path = "CO2.csv"
+    
     day_data = get_data_for_day(file_path, day_of_year)
+    
     if day_data:
         co2_value = float(day_data['CO2'])
         if co2_value > 1000:
             answer.config(text=f"CO2 līmenis {selected_day}. dienā: {co2_value}\nLūdzu izvediniet istabu!", fg='red')
-            button2.pack()
+            button2.config(command=lambda: update_co2(co2_value))  # Pass the co2_value when the button is clicked
+            button2.pack(anchor='e',padx=5, pady=5)
         else:
             answer.config(text=f"CO2 līmenis {selected_day}. dienā: {co2_value}", fg='green')
     else:
         answer.config(text="Nepadodas atrast datus par doto dienu!", fg='black')
-def air_out(co2):
-    return co2-500
+def update_co2(co2_value):
+    new_co2 = air_out(co2_value)
+    answer.config(text=f"CO2 līmenis pēc ventilācijas: {new_co2}", fg='blue')
+def air_out(co2_value):
+    return co2_value - 500
 def get_high_co2_data(file_path):
     with open(file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -91,18 +99,23 @@ def get_high_co2_data(file_path):
 #        get_high_co2_data(file_path)
 #    else:
 #        print("nope")
-frame1 = Frame(r, width=200, height=200)
-frame1.pack(padx=10, pady=10)
-frame2 = Frame(r, width=200, height=200)
-frame2.pack(padx=10, pady=10)
-frame3 = Frame(r, width=200, height=200)
-frame3.pack(padx=10, pady=10)
-frame4 = Frame(r,width=200,height=600)
-frame4.pack(padx=10,pady=10)
+
+frame=Frame(r,width=200,height=200,background="#457B9D")
+frame.pack(padx=10,pady=10)
+
+frame1 = Frame(frame, width=200, height=200)
+frame1.pack(padx=10, pady=10,anchor='nw',side=LEFT,fill=X)
+frame2 = Frame(frame, width=200, height=200)
+frame2.pack(padx=10, pady=10,anchor='ne',side=LEFT,fill=X)
+frame3 = Frame(frame, width=200, height=200,background='#457B9D')
+frame3.pack(padx=10, pady=10,anchor='center')
+frame4 = Frame(frame,width=200,height=600,background='#457B9D')
+frame4.pack(padx=10,pady=10,anchor='center')
+
 
 scrollbar1 = Scrollbar(frame1)
 scrollbar1.pack(side=RIGHT, fill=Y)
-monthlist = Listbox(frame1, yscrollcommand=scrollbar1.set)
+monthlist = Listbox(frame1, yscrollcommand=scrollbar1.set,background="#1D3557",foreground="#F1FAEE",borderwidth=0, highlightthickness=0)
 for m in months:
     monthlist.insert(END, m)
 monthlist.pack(side=LEFT, fill=BOTH)
@@ -111,15 +124,26 @@ monthlist.bind("<ButtonRelease-1>", on_month_select)
 
 scrollbar2 = Scrollbar(frame2)
 scrollbar2.pack(side=RIGHT, fill=Y)
-mylist = Listbox(frame2, yscrollcommand=scrollbar2.set)
+mylist = Listbox(frame2, yscrollcommand=scrollbar2.set,background="#1D3557",foreground="#F1FAEE",borderwidth=0, highlightthickness=0)
 mylist.pack(side=LEFT, fill=BOTH)
 scrollbar2.config(command=mylist.yview)
 
-button = tk.Button(frame3, text='Izvelēties', width=25,command=select_day)
-button.pack()
-button2 = tk.Button(frame4, text='Parbaudīt vēlreiz', width=25, command=air_out)
+file_path = "CO2.csv"
+selected_day_index = mylist.curselection()
+co2_value=0
+if not selected_day_index:
+    print("No item selected!")
+else:
+    selected_day = int(mylist.get(selected_day_index).split()[0])
+    day_of_year = get_day_of_year(selected_month, selected_day)
+    day_data = get_data_for_day(file_path, day_of_year)
+    co2_value = float(day_data['CO2'])
+    print(f"Selected day: {selected_day}")
 
-answer = tk.Label(frame4, text='', width=50, height=2, anchor='w')
+button = tk.Button(frame3, text='Izvelēties', width=25,background="#E63946",foreground="#F1FAEE",font='bold',command=select_day)
+button.pack()
+answer = tk.Label(frame4, text='', width=50, height=2, anchor='center')
 answer.pack()
+button2 = tk.Button(frame4, text='Parbaudīt vēlreiz', width=25, background="#E63946",foreground="#F1FAEE", anchor='center',font='bold', command=air_out(co2_value))
 
 r.mainloop()
