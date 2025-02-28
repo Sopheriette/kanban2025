@@ -19,7 +19,7 @@ def get_day_of_year(month, day):
 def on_month_select(event):
     global selected_month
     selected_month_index = monthlist.curselection()
-    if selected_month_index:  # Ensure a valid selection is made
+    if selected_month_index:
         selected_month = monthlist.get(selected_month_index)
         num_days = days_in_month[selected_month]
         mylist.delete(0, END)
@@ -27,7 +27,7 @@ def on_month_select(event):
             mylist.insert(END, f"{i} diena")
         mylist.pack(side=LEFT, fill=BOTH)
     else:
-        answer.config(text="Please select a month first!", fg='red')
+        answer.config(text="Vispirms izvēlējieties mēnesi!", fg='red')
 def get_data_for_day(file_path, day):
     with open(file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -36,19 +36,19 @@ def get_data_for_day(file_path, day):
                 return row
         return None
 def select_day():
-    global selected_month  # Access the global selected_month variable
+    global selected_month
     if not selected_month:
-        answer.config(text="Please select a month first!", fg='red')
+        answer.config(text="Vispirms izvēlējieties mēnesi!", fg='red')
         return
     
     selected_day_index = mylist.curselection()
     if not selected_day_index:
-        answer.config(text="Please select a day!", fg='red')
+        answer.config(text="Vispirms izvēlējieties dienu!", fg='red')
         return
     selected_day = int(mylist.get(selected_day_index).split()[0])
     
     day_of_year = get_day_of_year(selected_month, selected_day)
-    print(f"Day number in the year: {day_of_year}")
+    print(f"Dienuas numurs gadā: {day_of_year}")
     
     file_path = "CO2.csv"
     day_data = get_data_for_day(file_path, day_of_year)
@@ -56,11 +56,14 @@ def select_day():
     if day_data:
         co2_value = float(day_data['CO2'])
         if co2_value > 1000:
-            answer.config(text=f"CO2 level for day {selected_day}: {co2_value} (High!)", fg='red')
+            answer.config(text=f"CO2 līmenis {selected_day}. dienā: {co2_value}\nLūdzu izvediniet istabu!", fg='red')
+            button2.pack()
         else:
-            answer.config(text=f"CO2 level for day {selected_day}: {co2_value}", fg='green')
+            answer.config(text=f"CO2 līmenis {selected_day}. dienā: {co2_value}", fg='green')
     else:
-        answer.config(text="No data found for selected day", fg='black')
+        answer.config(text="Nepadodas atrast datus par doto dienu!", fg='black')
+def air_out(co2):
+    return co2-500
 def get_high_co2_data(file_path):
     with open(file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -118,6 +121,7 @@ scrollbar2.config(command=mylist.yview)
 
 button = tk.Button(frame3, text='Izvelēties', width=25,command=select_day)
 button.pack()
+button2 = tk.Button(frame4, text='Parbaudīt vēlreiz', width=25, command=air_out)
 
 answer = tk.Label(frame4, text='', width=50, height=2, anchor='w')
 answer.pack()
