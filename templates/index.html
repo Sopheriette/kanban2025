@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CO2 Programma</title>
+    <style>
+        body { background: lightblue; font-family: Arial, sans-serif; text-align: center; }
+        .box { width: 300px; margin: auto; background: steelblue; padding: 15px; border-radius: 10px; color: white; }
+        select, button { width: 100%; padding: 8px; margin: 5px 0; border-radius: 5px; border: none; }
+        button { background: red; color: white; cursor: pointer; }
+        .result { margin-top: 10px; padding: 10px; background: navy; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>CO2 Programma</h2>
+        <form method="POST">
+            <select id="month" name="month" required>
+                <option value="" disabled selected>Izvēlieties mēnesi</option>
+                {% for month in months %}
+                    <option>{{ month }}</option>
+                {% endfor %}
+            </select>
+            <select id="day" name="day" required>
+                <option value="" disabled selected>Izvēlieties dienu</option>
+            </select>
+            <button type="submit">Izvēlēties</button>
+        </form>
+        {% if co2_value is not none %}
+            <div class="result">
+                <p>CO2 līmenis: <strong>{{ co2_value }}</strong></p>
+                {% if alert_message %}<p style="color: yellow;">{{ alert_message }}</p>{% endif %}
+            </div>
+        {% endif %}
+    </div>
+    <script>
+        let days = {{ days_in_month | tojson }};
+        document.getElementById("month").onchange = function() {
+            let day = document.getElementById("day");
+            day.innerHTML = '<option value="" disabled selected>Izvēlieties dienu</option>';
+            for (let i = 1; i <= days[this.value]; i++) {
+                day.innerHTML += `<option>${i}</option>`;
+            }
+        };
+    </script>
+</body>
+</html>
