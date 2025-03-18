@@ -25,6 +25,7 @@ def on_month_select(event):
     selected_month_index = monthlist.curselection()
     if selected_month_index:
         selected_month = monthlist.get(selected_month_index)
+        # selected_month.itemconfig(bg='blue')
         num_days = days_in_month[selected_month]
         mylist.delete(0, END)
         for i in range(1, num_days + 1):
@@ -61,11 +62,11 @@ def select_day():
     if day_data:
         co2_value = float(day_data['CO2'])
         if co2_value > 1000:
-            answer.config(text=f"CO2 līmenis {selected_day}. dienā: {co2_value}\nLūdzu izvediniet istabu!", fg='red')
-            button2.config(command=lambda: update_co2(co2_value))  # Pass the co2_value when the button is clicked
+            answer.config(text=f"CO2 līmenis {selected_month} {selected_day}. dienā: {co2_value}\nLūdzu izvediniet istabu!", fg='red')
+            button2.config(command=lambda: update_co2(co2_value))
             button2.pack(anchor='e',padx=5, pady=5)
         else:
-            answer.config(text=f"CO2 līmenis {selected_day}. dienā: {co2_value}", fg='green')
+            answer.config(text=f"CO2 līmenis {selected_month} {selected_day}. dienā: {co2_value}", fg='green')
     else:
         answer.config(text="Nepadodas atrast datus par doto dienu!", fg='black')
 def update_co2(co2_value):
