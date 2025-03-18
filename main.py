@@ -47,12 +47,12 @@ def select_day():
         answer.config(text="Vispirms izvēlējieties mēnesi!", fg='red')
         return
     selected_day_index = mylist.curselection()
-    
-    if not selected_day_index:  # If nothing is selected
+
+    if not selected_day_index:
         answer.config(text="Vispirms izvēlējieties dienu!", fg='red')
         return
 
-    selected_day = int(mylist.get(selected_day_index[0]).split()[0])  # Get the selected day
+    selected_day = int(mylist.get(selected_day_index[0]).split()[0])
     day_of_year = get_day_of_year(selected_month, selected_day)
     print(f"Dienuas numurs gadā: {day_of_year}")
     
